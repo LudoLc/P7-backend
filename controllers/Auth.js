@@ -20,12 +20,15 @@ class AuthController {
           if (bcrypt.compareSync(req.body.password, user.password)) {
             return res.status(201).send({
               // renvoie une 201 et genère un token
-
-              token: jwt.sign({
-                id: user.id,
-                email: user.email,
-                username: user.username,
-              }, process.env.SECRET_JWT_KEY, { expiresIn: Date.now() + 1000 * 60 * 60 * 24 * 45 })
+              token: jwt.sign(
+                {
+                  id: user.id,
+                  email: user.email,
+                  username: user.username,
+                },
+                process.env.SECRET_JWT_KEY,
+                { expiresIn: 60 * 60 * 24 * 45 }
+              ),
             });
           }
           return res.status(401).send({
