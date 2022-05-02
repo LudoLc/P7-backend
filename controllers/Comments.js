@@ -1,5 +1,5 @@
 const CommentModel = require("../models/Comments");
-const { commentsSchema } = require("../schemas/comments");
+const { commentSchema } = require("../schemas/comment");
 const { yupErrorToJson } = require("../src/helpers");
 const fs = require("fs");
 
@@ -11,7 +11,7 @@ class CommentsController {
     .catch((error) => res.status(401).send(error));
   }
   async createComment (req, res){
-    commentsSchema
+    commentSchema
     .validate(req.body, { abortEarly: false, strict: true })
     .then(() => {
       CommentModel.create(req.body)
@@ -37,7 +37,7 @@ class CommentsController {
   getComment(req, res) {
     CommentModel.findOne({
       where: {
-        id: req.query.id,
+        id: req.params.id,
       },
     })
     .then((comment) => {
@@ -51,7 +51,7 @@ class CommentsController {
   updateComment(req, res) {
     CommentModel.findOne({
       where: {
-        id: req.query.id,
+        id: req.params.id,
       },
     })
     .then((comment) => {
@@ -68,7 +68,7 @@ class CommentsController {
     CommentModel.findOne({
       // on utilise le findOne pour recuperer un element
       where: {
-        id: req.query.id, // recuperation de l'iD dans le req.query
+        id: req.params.id, // recuperation de l'iD dans le req.params
       },
     })
       .then((comment) => {

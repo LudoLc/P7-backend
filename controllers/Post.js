@@ -37,7 +37,7 @@ class PostController {
   getPost(req, res) {
     PostModel.findOne({
       where: {
-        id: req.query.id,
+        id: req.params.id,
       },
     })
       .then((post) => {
@@ -53,7 +53,7 @@ class PostController {
     PostModel.findOne({
       // on recupere l'id du post a modifier
       where: {
-        id: req.query.id, // récupération dans le req.query.id
+        id: req.params.id, // récupération dans le req.params.id
       },
     })
     .then((post) => {
@@ -70,7 +70,7 @@ class PostController {
     PostModel.findOne({
       // on utilise le findOne pour recuperer un element
       where: {
-        id: req.query.id, // recuperation de l'iD dans le req.query
+        id: req.params.id, // recuperation de l'iD dans le req.params
       },
     })
       .then((post) => {
