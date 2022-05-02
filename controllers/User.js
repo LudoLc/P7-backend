@@ -14,7 +14,8 @@ class UserController {
     signupSchema // on apelle le schema pour les users
       .validate(req.body, { abortEarly: false, strict: true }) // on fait le validate et on req le body
       .then(() => {
-        UserModel.create(req.body) // a partir du userModel , si les infos sont bonnes alors on retourne une 200 : user crée
+        // Object.assign on deplace la requete dans le roleId (si = 1 = admin sinon  = non admin)
+        UserModel.create(Object.assign({ roleId: 1 }, req.body)) // a partir du userModel , si les infos sont bonnes alors on retourne une 200 : user crée
           .then((user) => {
             res.status(200).send({
               message: "user crée",
@@ -55,8 +56,7 @@ class UserController {
       where: {
         id: req.params.id, // récupération dans le req.params.id
       },
-    })
-    .then((user) => {
+    }).then((user) => {
       if (user instanceof UserModel) {
         // on verifie si le usere est dans le userModel
         const userToModify = req.body;
@@ -78,10 +78,10 @@ class UserController {
           // grace a multer on va supprimer l'image source dans le images/filename
           //const filename = user.media.split("/images/")[1];
           //return fs.unlink(`images/${filename}`, () => {
-            return user
-              .destroy()
-              .then(() => res.status(200).json({ message: "user supprimé!" }))
-              .catch((error) => res.status(401).json({ error }));
+          return user
+            .destroy()
+            .then(() => res.status(200).json({ message: "user supprimé!" }))
+            .catch((error) => res.status(401).json({ error }));
           //});
         }
         res.status(404).send({ error: "user introuvable!" });

@@ -1,13 +1,23 @@
 const express = require("express");
 const router = express.Router();
-const commentController = require('../controllers/Comments');
-const connexionGuard = require("../middlewares/guards/connexionGuard");
-const sameUserGuard = require("../middlewares/guards/sameUserGuard");
+const commentController = require("../controllers/Comments");
+const connectionGuard = require("../middlewares/guards/connectionGuard");
+const authorisationGuard = require("../middlewares/guards/authorisationGuard");
 
 router.get("/", commentController.getAllComments);
-router.post("/", connexionGuard, commentController.createComment);
+router.post("/", connectionGuard, commentController.createComment);
 router.get("/:id", commentController.getComment);
-router.put("/:id", connexionGuard, sameUserGuard(false),commentController.updateComment);
-router.delete("/:id", connexionGuard, sameUserGuard(false),commentController.deleteComment);
+router.put(
+  "/:id",
+  connectionGuard,
+  authorisationGuard,
+  commentController.updateComment
+);
+router.delete(
+  "/:id",
+  connectionGuard,
+  authorisationGuard,
+  commentController.deleteComment
+);
 
 module.exports = router;

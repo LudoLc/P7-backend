@@ -3,11 +3,13 @@ const bodyParser = require("body-parser");
 const { xss } = require("express-xss-sanitizer"); // empêche les injections xss (un code injecté pourra être lu mais pas interpreté par le code)
 require("dotenv").config();
 const app = express();
-const auth = require('./routes/auth');
-const user = require('./routes/user');
-const post = require('./routes/post');
-const comment = require('./routes/comment');
-const authMiddleware = require('./middlewares/auth');
+const auth = require("./routes/auth");
+const user = require("./routes/user");
+const post = require("./routes/post");
+const comment = require("./routes/comment");
+const authMiddleware = require("./middlewares/auth");
+
+require("./models/Role");
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -30,7 +32,9 @@ app.use("/api/auth", auth);
 app.use("/api/users", user);
 app.use("/api/posts", post);
 app.use("/api/comments", comment);
-app.all("*", (req, res)=> {res.send('{"message": "Bad Request"}')});
-app.listen(process.env.PORT || "3000", ()=> {console.log("Server lancé sur le localhost:3000");
+app.all("*", (req, res) => {
+  res.send('{"message": "Bad Request"}');
 });
-
+app.listen(process.env.PORT || "3000", () => {
+  console.log("Server lancé sur le localhost:3000");
+});
