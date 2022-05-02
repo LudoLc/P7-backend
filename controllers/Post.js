@@ -55,7 +55,8 @@ class PostController {
       where: {
         id: req.query.id, // récupération dans le req.query.id
       },
-    }).then((post) => {
+    })
+    .then((post) => {
       if (post instanceof PostModel) {
         // on verifie si le poste est dans le PostModel
         const postToModify = req.body;
