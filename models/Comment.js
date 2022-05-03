@@ -1,12 +1,9 @@
 const { Model, DataTypes } = require('@sequelize/core');
 const sequelize = require('../src/db');
 
-class Post extends Model {
+class Comment extends Model {
 }
-Post.init({
-  title: {
-    type: DataTypes.STRING
-  },
+Comment.init({
   content: {
     type: DataTypes.STRING
   },
@@ -19,5 +16,5 @@ Post.init({
   updatedAt: true,
 })
 
+module.exports = Comment; // appel du module .
 
-module.exports = Post; // appel du module .

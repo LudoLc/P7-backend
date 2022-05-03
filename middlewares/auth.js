@@ -9,7 +9,7 @@ module.exports = (req, res, next) => {
     const decodedToken = jwt.verify(token, process.env.SECRET_JWT_KEY);
     req.state.set("TOKEN", decodedToken);
     req.state.set("Connected", true); // connexion
-    req.state.set("isAdmin", decodedToken.role.admin);
+    req.state.set("isAdmin", decodedToken.Role.admin);
   } catch (error) {
     req.state.set("TOKEN", null);
     req.state.set("Connected", false); // non connecté

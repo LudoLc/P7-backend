@@ -1,92 +1,96 @@
-const PostModel = require("../models/Post");
+const { Post, User } = require("../models");
+const { ValidationError } = require("yup");
 const { postSchema } = require("../schemas/post");
 const { yupErrorToJson } = require("../src/helpers");
-const fs = require("fs");
+const fs = require("fs/promises");
 
 class PostController {
-  // implémentation de la classe Postcontroller + récuperation du Model
-  getAllPosts(req, res) {
-    PostModel.findAll()
-      .then((posts) => res.status(200).send(posts.map((post) => post.get())))
-      .catch((error) => res.status(401).send(error));
+  constructor() {
+    // on force le this a avoir la valeur du post controller .
+    this.getAllPosts = this.getAllPosts.bind(this);
+    this.createPost = this.createPost.bind(this);
+    this.getPost = this.getPost.bind(this);
+    this.updatePost = this.updatePost.bind(this);
+    this.deletePost = this.deletePost.bind(this);
   }
-  async createPost(req, res) {
-    postSchema // on apelle le schema pour les posts
-      .validate(req.body, { abortEarly: false, strict: true }) // on fait le validate et on req le body
-      .then(() => {
-        PostModel.create(req.body) // a partir du PostModel , si les infos sont bonnes alors on retourne une 200 : post crée
-          .then((post) => {
-            res.status(200).send({
-              message: "Post crée",
-              ...post.get(), // on recuperer le contenu dans la BDD
-            });
-          })
-          .catch(
-            (
-              error // si il y'a une erreur , on renvoie une 500
-            ) => res.status(500).send({ error: "Internal server error" })
-          );
-      })
-      .catch((errors) => {
-        res.status(400).send({
-          // renvoie un status 400 en cas de non remplissage de conditions
-          errors: yupErrorToJson(errors),
-        });
-      });
-  }
-  getPost(req, res) {
-    PostModel.findOne({
+
+  getPostID(id = null) {
+    if (id === null) return Post.findAll({ include: User });
+    return Post.findOne({
       where: {
-        id: req.params.id,
+        id: id,
       },
-    })
-      .then((post) => {
-        // let .get() va permettre de récuperer le contenu du poste (qui se trouve dans la BDD)
-        if (post instanceof PostModel) return res.status(200).send(post.get());
-        res.status(404).send({ error: "Unauthorized" });
-      })
-      .catch((error) =>
-        res.status(500).send({ error: "Internal server error" })
-      );
-  }
-  updatePost(req, res) {
-    PostModel.findOne({
-      // on recupere l'id du post a modifier
-      where: {
-        id: req.params.id, // récupération dans le req.params.id
-      },
-    })
-    .then((post) => {
-      if (post instanceof PostModel) {
-        // on verifie si le poste est dans le PostModel
-        const postToModify = req.body;
-        post.update(postToModify);
-        return res.status(200).send(post.get());
-      }
-      res.status(404).send({ error: "Not found" });
+      include: User,
     });
   }
-  deletePost(req, res) {
-    PostModel.findOne({
-      // on utilise le findOne pour recuperer un element
-      where: {
-        id: req.params.id, // recuperation de l'iD dans le req.params
-      },
-    })
-      .then((post) => {
-        if (post instanceof PostModel) {
-          // grace a multer on va supprimer l'image source dans le images/filename
-          const filename = post.media.split("/images/")[1];
-          return fs.unlink(`images/${filename}`, () => {
-            post
-              .destroy()
-              .then(() => res.status(200).json({ message: "Post supprimé!" }))
-              .catch((error) => res.status(401).json({ error }));
-          });
-        }
-        res.status(404).send({ error: "Post introuvable!" });
-      })
-      .catch((error) => res.status(500).json({ error }));
+
+  // implémentation de la classe Postcontroller + récuperation du Model
+  async getAllPosts(req, res) {
+    console.log(this);
+    try {
+      const posts = await this.getPostID();
+      res.status(200).send(JSON.stringify(posts, null, 2));
+    } catch (error) {
+      res.status(401).send({ error });
+    }
+  }
+  async createPost(req, res) {
+    try {
+      const decodedToken = req.state.get("TOKEN");
+      // on apelle le schema pour les posts
+      await postSchema.validate(req.body, { abortEarly: false, strict: true }); // on fait le validate et on req le body
+      const post = await Post.create(
+        Object.assign(req.body, { UserId: decodedToken.id })
+      ); // a partir du Post , si les infos sont bonnes alors on retourne une 200 : post crée
+      res.status(200).send({
+        message: "Post crée",
+        ...post.get(), // on recuperer le contenu dans la BDD
+      });
+    } catch (error) {
+      if (error instanceof ValidationError)
+        return res.status(400).send({
+          // renvoie un status 400 en cas de non remplissage de conditions
+          errors: yupErrorToJson(error),
+        });
+      res.status(500).send({ error: "Internal server error" });
+    }
+  }
+  async getPost(req, res) {
+    try {
+      const post = await this.getPostID(req.params.id);
+      // let .get() va permettre de récuperer le contenu du poste (qui se trouve dans la BDD)
+      if (post instanceof Post) return res.status(200).send(post.get());
+      res.status(404).send({ error: "Unauthorized" });
+    } catch (error) {
+      res.status(500).send({ error: "Internal server error" });
+    }
+  }
+  async updatePost(req, res) {
+    try {
+      const post = await this.getPostID(req.params.id);
+      if (post === null) return res.status(404).send({ error: "Not found" });
+
+      // on verifie si le poste est dans le Post
+      const postToModify = req.body;
+      post.update(postToModify);
+      res.status(200).send(post.get());
+    } catch (error) {
+      res.status(500).send({ error: "Internal server error" });
+    }
+  }
+  async deletePost(req, res) {
+    try {
+      const post = await this.getPostID(req.params.id);
+      if (post === null)
+        return res.status(404).send({ error: "Post introuvable!" });
+      // grace a multer on va supprimer l'image source dans le images/filename
+      const filename = post.media.split("/images/")[1];
+      await fs.unlink(`images/${filename}`);
+      await post.destroy();
+      res.status(200).json({ message: "Post supprimé!" });
+    } catch (error) {
+      res.status(500).json({ error });
+    }
   }
 }
 
