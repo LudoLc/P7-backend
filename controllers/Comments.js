@@ -2,6 +2,7 @@ const { Comment, User, Post } = require("../models");
 const { commentSchema } = require("../schemas/comment");
 const { yupErrorToJson } = require("../src/helpers");
 const fs = require("fs/promises");
+const { ValidationError } = require("yup");
 
 class CommentsController {
   constructor() {
@@ -40,7 +41,7 @@ class CommentsController {
       });
 
       const comment = await Comment.create(
-        Object.assign(req.body, { UserId: decodedToken.id })
+        Object.assign(req.body, { UserId: req.state.get("TOKEN").id })
       );
       res.status(200).send({
         message: "Commentaire crée",

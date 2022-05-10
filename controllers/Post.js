@@ -3,6 +3,7 @@ const { ValidationError } = require("yup");
 const { postSchema } = require("../schemas/post");
 const { yupErrorToJson } = require("../src/helpers");
 const fs = require("fs/promises");
+const { log } = require("console");
 
 class PostController {
   constructor() {
@@ -15,11 +16,14 @@ class PostController {
   }
 
   getPostID(id = null) {
-    if (id === null) return Post.findAll({ include: User });
+    if (id === null) return Post.findAll({ include: User, order:[['id', 'ASC']] });
     return Post.findOne({
       where: {
         id: id,
       },
+      order: [
+        ['id', 'ASC']
+      ],
       include: User,
     });
   }
@@ -68,6 +72,7 @@ class PostController {
   async updatePost(req, res) {
     try {
       const post = await this.getPostID(req.params.id);
+      console.log(post);
       if (post === null) return res.status(404).send({ error: "Not found" });
 
       // on verifie si le poste est dans le Post

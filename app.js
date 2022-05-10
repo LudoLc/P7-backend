@@ -1,5 +1,4 @@
 const express = require("express");
-const bodyParser = require("body-parser");
 const { xss } = require("express-xss-sanitizer"); // empêche les injections xss (un code injecté pourra être lu mais pas interpreté par le code)
 require("dotenv").config();
 const app = express();
@@ -24,7 +23,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(bodyParser.json()); // pour rendre cela exploitable
 app.use(express.json());
 app.use(authMiddleware);
 app.use(xss());
@@ -35,6 +33,6 @@ app.use("/api/comments", comment);
 app.all("*", (req, res) => {
   res.send('{"message": "Bad Request"}');
 });
-app.listen(process.env.PORT || "3000", () => {
-  console.log("Server lancé sur le localhost:3000");
+app.listen(process.env.PORT || "8000", () => {
+  console.log("Server lancé sur le localhost:8000");
 });

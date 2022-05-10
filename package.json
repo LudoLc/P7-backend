@@ -1,7 +1,6 @@
 {
   "name": "p7-backend",
   "version": "1.0.0",
-  "description": "",
   "main": "app.js",
   "scripts": {
     "dev": "nodemon app.js",
@@ -26,5 +25,14 @@
     "@types/express": "^4.17.13",
     "@types/validator": "^13.7.2",
     "nodemon": "^2.0.15"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LudoLc/P7-backend.git"
+  },
+  "bugs": {
+    "url": "https://github.com/LudoLc/P7-backend/issues"
+  },
+  "homepage": "https://github.com/LudoLc/P7-backend#readme",
+  "description": ""
 }

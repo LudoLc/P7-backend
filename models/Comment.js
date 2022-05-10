@@ -7,8 +7,8 @@ Comment.init({
   content: {
     type: DataTypes.STRING
   },
-  media: {
-    type: DataTypes.STRING
+  title: {
+    type: DataTypes.STRING 
   }
 }, {
   sequelize,

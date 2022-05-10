@@ -9,6 +9,7 @@ class AuthController {
   // classe qui contient les données du login et signup afin de les réutiliser
   async login(req, res) {
     try {
+      console.log(req.body);
       await loginSchema.validate(req.body, { abortEarly: false, strict: true });
       const user = await User.findOne({
         where: {
@@ -39,7 +40,7 @@ class AuthController {
       });
     } catch (error) {
       if (error instanceof ValidationError)
-        res.status(400).send({
+        return res.status(400).send({
           // renvoie un status 400 en cas de non remplissage de conditions
           errors: yupErrorToJson(error),
         });
@@ -57,7 +58,7 @@ class AuthController {
       const user = await User.create(
         Object.assign(req.body, {
           RoleId: 1,
-          password: bcrypt.hashSync(user.password, 10),
+          password: bcrypt.hashSync(req.body.password, 10),
         })
       ); // fonction pour créer l'utilisateur si les données remplies avant sont bonnes
       res.status(201).send({
@@ -66,14 +67,16 @@ class AuthController {
         ...user.get(),
       });
     } catch (error) {
-      if (error instanceof ValidationError)
+      if (error instanceof ValidationError){
         return res.status(400).send({
           // renvoie un status 400 en cas de non remplissage de conditions
           errors: yupErrorToJson(error),
         });
+      }
 
       res.status(409).send({
         error: "L'email ou le username est déjà utilisé!",
+        error,
       });
     }
   }
