@@ -30,7 +30,6 @@ class PostController {
 
   // implémentation de la classe Postcontroller + récuperation du Model
   async getAllPosts(req, res) {
-    console.log(this);
     try {
       const posts = await this.getPostID();
       res.status(200).send(JSON.stringify(posts, null, 2));
@@ -72,7 +71,6 @@ class PostController {
   async updatePost(req, res) {
     try {
       const post = await this.getPostID(req.params.id);
-      console.log(post);
       if (post === null) return res.status(404).send({ error: "Not found" });
 
       // on verifie si le poste est dans le Post

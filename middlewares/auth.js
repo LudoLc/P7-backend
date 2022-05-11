@@ -11,6 +11,7 @@ module.exports = (req, res, next) => {
     req.state.set("Connected", true); // connexion
     req.state.set("isAdmin", decodedToken.Role.admin);
   } catch (error) {
+    console.error(error);
     req.state.set("TOKEN", null);
     req.state.set("Connected", false); // non connecté
     req.state.set("isAdmin", false);

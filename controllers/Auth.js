@@ -9,7 +9,6 @@ class AuthController {
   // classe qui contient les données du login et signup afin de les réutiliser
   async login(req, res) {
     try {
-      console.log(req.body);
       await loginSchema.validate(req.body, { abortEarly: false, strict: true });
       const user = await User.findOne({
         where: {
@@ -20,7 +19,7 @@ class AuthController {
 
       if (user === null || user.Role === null)
         return res.status(404).send({
-          error: "User not found",
+          error: "Utilisateur non trouvé!",
         });
 
       if (!bcrypt.compareSync(req.body.password, user.password))
@@ -55,16 +54,24 @@ class AuthController {
         strict: true,
       });
 
-      const user = await User.create(
+      const userCreated = await User.create(
         Object.assign(req.body, {
           RoleId: 1,
           password: bcrypt.hashSync(req.body.password, 10),
         })
       ); // fonction pour créer l'utilisateur si les données remplies avant sont bonnes
+      const user = await User.findOne({
+        where: {
+          email: userCreated.email,
+        },
+        include: Role,
+      });
       res.status(201).send({
         // si les conditions sont remplies renvoie une 201 avec les données nécessaires à l'utilisateur.
-        message: "Created",
-        ...user.get(),
+        message: "Crée",
+        token: jwt.sign(user.get(), process.env.SECRET_JWT_KEY, {
+          expiresIn: 60 * 60 * 24 * 45,
+        }),
       });
     } catch (error) {
       if (error instanceof ValidationError){
