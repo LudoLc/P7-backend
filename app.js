@@ -22,8 +22,10 @@ app.use((req, res, next) => {
   next();
 });
 
+
 app.use(express.json());
 app.use(xss());
+app.use(express.static("public"))
 app.use("/api/auth", auth);
 app.use("/api/users", user);
 app.use("/api/posts", post);

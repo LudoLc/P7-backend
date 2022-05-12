@@ -38,17 +38,19 @@ class PostController {
     }
   }
   async createPost(req, res) {
-    console.log(req);
     try {
+      console.log(req.file);
       const decodedToken = req.state.get("TOKEN");
       // on apelle le schema pour les posts
       await postSchema.validate(req.body, { abortEarly: false, strict: true }); // on fait le validate et on req le body
-      const post = await Post.create(
-        Object.assign(req.body, { UserId: decodedToken.id })
-      ); // a partir du Post , si les infos sont bonnes alors on retourne une 200 : post crée
+      const post = Object.assign(req.body, { UserId: decodedToken.id }) 
+      if(req.file){
+        post.media = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`
+      }
+      await Post.create(post); // a partir du Post , si les infos sont bonnes alors on retourne une 200 : post crée
       res.status(200).send({
         message: "Post crée",
-        ...post.get(), // on recuperer le contenu dans la BDD
+        ...post, // on recuperer le contenu dans la BDD
       });
     } catch (error) {
       if (error instanceof ValidationError)
@@ -56,7 +58,7 @@ class PostController {
           // renvoie un status 400 en cas de non remplissage de conditions
           errors: yupErrorToJson(error),
         });
-      res.status(500).send({ error: "Internal server error" });
+      res.status(500).send({ error: `Internal server error ${error}` });
     }
   }
   async getPost(req, res) {
