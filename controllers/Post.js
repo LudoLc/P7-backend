@@ -38,6 +38,7 @@ class PostController {
     }
   }
   async createPost(req, res) {
+    console.log(req);
     try {
       const decodedToken = req.state.get("TOKEN");
       // on apelle le schema pour les posts

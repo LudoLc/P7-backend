@@ -5,7 +5,7 @@ const connectionGuard = require("../middlewares/guards/connectionGuard");
 //const authorisationGuard = require("../middlewares/guards/authorisationGuard");
 const auth = require('../middlewares/auth')
 
-router.get("/", auth, commentController.getAllComments);
+router.get("/", commentController.getAllComments);
 router.post("/", auth, connectionGuard, commentController.createComment);
 router.get("/:id",auth, commentController.getComment);
 router.put("/:id",auth, connectionGuard,commentController.updateComment);

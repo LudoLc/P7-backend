@@ -13,8 +13,11 @@ const storage = multer.diskStorage({
     callback(null, "images");
   },
   filename: (req, file, callback) => {
+    console.log(req.state);
+    const decodedToken = req.state.get("TOKEN");
     // permet de recuperer l'id de l'utilisateur , on genere le nom du fichier , et si ce fichier n'existe pas alors ==> creation.
-    const userId = JSON.parse(req.body.post).userId;
+    const userId = decodedToken.id;
+    //JSON.parse(req.body.post).userId;
     const name = file.originalname.split(" ").join("_");
     const extension = MIME_TYPES[file.mimetype];
     const filename = name.replace(extension, "") + userId + "." + extension;
