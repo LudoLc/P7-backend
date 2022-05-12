@@ -6,7 +6,6 @@ const auth = require("./routes/auth");
 const user = require("./routes/user");
 const post = require("./routes/post");
 const comment = require("./routes/comment");
-const authMiddleware = require("./middlewares/auth");
 
 require("./models/Role");
 
@@ -24,7 +23,6 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
-app.use(authMiddleware);
 app.use(xss());
 app.use("/api/auth", auth);
 app.use("/api/users", user);

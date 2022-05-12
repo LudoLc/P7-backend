@@ -1,9 +1,9 @@
-const { Post, User } = require("../models");
+const { Post, User, Comment } = require("../models");
 const { ValidationError } = require("yup");
 const { postSchema } = require("../schemas/post");
 const { yupErrorToJson } = require("../src/helpers");
 const fs = require("fs/promises");
-const { log } = require("console");
+
 
 class PostController {
   constructor() {
@@ -16,7 +16,7 @@ class PostController {
   }
 
   getPostID(id = null) {
-    if (id === null) return Post.findAll({ include: User, order:[['id', 'ASC']] });
+    if (id === null) return Post.findAll({ include: [User, Comment], order:[['id', 'ASC']] });
     return Post.findOne({
       where: {
         id: id,
@@ -24,7 +24,7 @@ class PostController {
       order: [
         ['id', 'ASC']
       ],
-      include: User,
+      include: [User,Comment],
     });
   }
 

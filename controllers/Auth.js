@@ -33,6 +33,7 @@ class AuthController {
       return res.status(201).send({
         // infos: JSON.stringify(user),
         // renvoie une 201 et genère un token
+        user,
         token: jwt.sign(user.get(), process.env.SECRET_JWT_KEY, {
           expiresIn: 60 * 60 * 24 * 45,
         }),

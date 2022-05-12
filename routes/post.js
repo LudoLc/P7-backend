@@ -3,11 +3,12 @@ const router = express.Router();
 const postController = require("../controllers/Post");
 const connectionGuard = require("../middlewares/guards/connectionGuard");
 //const authorisationGuard = require("../middlewares/guards/authorisationGuard");
+const auth = require('../middlewares/auth')
 
-router.get("/", postController.getAllPosts);
-router.post("/", connectionGuard, postController.createPost);
-router.get("/:id", postController.getPost);
-router.put("/:id",connectionGuard,postController.updatePost);
-router.delete("/:id",connectionGuard,postController.deletePost);
+router.get("/", auth,postController.getAllPosts);
+router.post("/",auth, connectionGuard, postController.createPost);
+router.get("/:id",auth,postController.getPost);
+router.put("/:id",auth ,connectionGuard,postController.updatePost);
+router.delete("/:id",auth,connectionGuard,postController.deletePost);
 
 module.exports = router;
