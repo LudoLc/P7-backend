@@ -70,6 +70,7 @@ class AuthController {
       res.status(201).send({
         // si les conditions sont remplies renvoie une 201 avec les données nécessaires à l'utilisateur.
         message: "Crée",
+        user,
         token: jwt.sign(user.get(), process.env.SECRET_JWT_KEY, {
           expiresIn: 60 * 60 * 24 * 45,
         }),

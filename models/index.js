@@ -19,7 +19,7 @@ Post.hasMany(Comment);
 Comment.belongsTo(Post);
 
 sequelize
-  .sync({ alter: true })
+  .sync()
   .then(() => console.log("syncrhonisation effectuée"));
 //.catch(()=> console.error("Une erreur est survenue lors de la synchronisation"))
 

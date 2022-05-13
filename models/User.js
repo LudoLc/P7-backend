@@ -24,6 +24,12 @@ User.init(
     firstname: {
       type: DataTypes.STRING,
     },
+    avatar: {
+      type: DataTypes.STRING,
+    },
+    description: {
+      type: DataTypes.STRING
+    }
   },
   {
     sequelize,

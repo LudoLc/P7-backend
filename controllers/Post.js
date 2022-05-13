@@ -39,7 +39,6 @@ class PostController {
   }
   async createPost(req, res) {
     try {
-      console.log(req.file);
       const decodedToken = req.state.get("TOKEN");
       // on apelle le schema pour les posts
       await postSchema.validate(req.body, { abortEarly: false, strict: true }); // on fait le validate et on req le body
@@ -90,8 +89,10 @@ class PostController {
       if (post === null)
         return res.status(404).send({ error: "Post introuvable!" });
       // grace a multer on va supprimer l'image source dans le images/filename
-      const filename = post.media.split("/images/")[1];
-      await fs.unlink(`images/${filename}`);
+      if(post.media){
+        const filename = post.media.split("/images/")[1];
+        await fs.unlink(`images/${filename}`);
+      }
       await post.destroy();
       res.status(200).json({ message: "Post supprimé!" });
     } catch (error) {

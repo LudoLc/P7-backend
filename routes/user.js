@@ -10,6 +10,7 @@ router.get("/", auth, userController.getAllUsers);
 router.post("/", auth, connectionGuard, userController.createUser);
 router.get("/:id", auth, userController.getUser);
 router.put("/:id",auth, multer,connectionGuard,userController.updateUser);
+router.put("/avatar/:id",auth, multer, connectionGuard,userController.updateAvatar);
 router.delete("/:id",auth, connectionGuard,userController.deleteUser);
 
 module.exports = router;

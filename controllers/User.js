@@ -2,6 +2,7 @@ const { User, Role } = require("../models");
 const { ValidationError } = require("yup");
 const { yupErrorToJson } = require("../src/helpers");
 const { signupSchema } = require("../schemas/auth");
+const { fstat } = require("fs");
 
 class UserController {
   constructor() {
@@ -11,6 +12,7 @@ class UserController {
     this.getUser = this.getUser.bind(this);
     this.updateUser = this.updateUser.bind(this);
     this.deleteUser = this.deleteUser.bind(this);
+    this.updateAvatar = this.updateAvatar.bind(this);
   }
 
   getUserID(id = null) {
@@ -72,13 +74,30 @@ class UserController {
   }
   async updateUser(req, res) {
     try {
-      const updateUser = await this.getUserID(req.params.id);
-      if (user === null) return res.status(404).send({ error: "Not found" });
+      const user = await this.getUserID(req.params.id);
+      if (!user) return res.status(404).send({ error: "Not found" });
       const userToModify = req.body;
+      if(req.file){
+        userToModify.avatar = `${req.protocol}://${req.get("host")}/public/images/${req.file.filename}`
+      }
+      console.log(userToModify);
       user.update(userToModify);
       res.status(200).send(user.get());
-      // on verifie si le usere est dans le User
+      // on verifie si le user est dans le User
     } catch (error) {}
+  }
+  async updateAvatar(req, res) {
+    try {
+      const user = await this.getUserID(req.params.id);
+      if (!user) return res.status(404).send({ error: "Not found" });
+      await user.update({
+        avatar: req.file.filename
+      })
+      res.status(200).send()
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error });
+    }
   }
   async deleteUser(req, res) {
     try {
