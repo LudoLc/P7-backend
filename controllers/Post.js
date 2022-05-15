@@ -16,13 +16,13 @@ class PostController {
   }
 
   getPostID(id = null) {
-    if (id === null) return Post.findAll({ include: [User, Comment], order:[['id', 'ASC']] });
+    if (id === null) return Post.findAll({ include: [User, {model: Comment, include:[User]}], order:[['id', 'DESC']] });
     return Post.findOne({
       where: {
         id: id,
       },
       order: [
-        ['id', 'ASC']
+        ['id', 'DESC']
       ],
       include: [User,Comment],
     });
@@ -44,7 +44,7 @@ class PostController {
       await postSchema.validate(req.body, { abortEarly: false, strict: true }); // on fait le validate et on req le body
       const post = Object.assign(req.body, { UserId: decodedToken.id }) 
       if(req.file){
-        post.media = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`
+        post.media = `${req.protocol}://${req.get("host")}/public/images/${req.file.filename}`
       }
       await Post.create(post); // a partir du Post , si les infos sont bonnes alors on retourne une 200 : post crée
       res.status(200).send({
@@ -74,11 +74,15 @@ class PostController {
     try {
       const post = await this.getPostID(req.params.id);
       if (post === null) return res.status(404).send({ error: "Not found" });
-
+      if(post.UserId !== req.state.get("TOKEN").id && !req.state.get("TOKEN").Role.admin)
+      return res.status(401).send({error: "Vous n'avez pas les droits pour faire ceci!"})
       // on verifie si le poste est dans le Post
       const postToModify = req.body;
       post.update(postToModify);
       res.status(200).send(post.get());
+      if(req.file){
+        post.media = `${req.protocol}://${req.get("host")}/public/images/${req.file.filename}`
+      }
     } catch (error) {
       res.status(500).send({ error: "Internal server error" });
     }
@@ -88,10 +92,12 @@ class PostController {
       const post = await this.getPostID(req.params.id);
       if (post === null)
         return res.status(404).send({ error: "Post introuvable!" });
+        if(post.UserId !== req.state.get("TOKEN").id && !req.state.get("TOKEN").Role.admin)
+        return res.status(401).send({error: "Vous n'avez pas les droits pour faire ceci!"})
       // grace a multer on va supprimer l'image source dans le images/filename
       if(post.media){
         const filename = post.media.split("/images/")[1];
-        await fs.unlink(`images/${filename}`);
+        await fs.unlink(`public/images/${filename}`);
       }
       await post.destroy();
       res.status(200).json({ message: "Post supprimé!" });

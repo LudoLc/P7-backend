@@ -80,7 +80,6 @@ class UserController {
       if(req.file){
         userToModify.avatar = `${req.protocol}://${req.get("host")}/public/images/${req.file.filename}`
       }
-      console.log(userToModify);
       user.update(userToModify);
       res.status(200).send(user.get());
       // on verifie si le user est dans le User
@@ -95,7 +94,6 @@ class UserController {
       })
       res.status(200).send()
     } catch (error) {
-      console.log(error);
       res.status(500).json({ error });
     }
   }
