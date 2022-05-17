@@ -1,4 +1,4 @@
-const { Post, User, Comment } = require("../models");
+const { Post, User, Comment, Reaction } = require("../models");
 const { ValidationError } = require("yup");
 const { postSchema } = require("../schemas/post");
 const { yupErrorToJson } = require("../src/helpers");
@@ -16,7 +16,7 @@ class PostController {
   }
 
   getPostID(id = null) {
-    if (id === null) return Post.findAll({ include: [User, {model: Comment, include:[User]}], order:[['id', 'DESC']] });
+    if (id === null) return Post.findAll({ include: [User, {model: Comment, include:[User]}, Reaction], order:[['id', 'DESC']] });
     return Post.findOne({
       where: {
         id: id,
@@ -24,7 +24,7 @@ class PostController {
       order: [
         ['id', 'DESC']
       ],
-      include: [User,Comment],
+      include: [User,Comment, Reaction],
     });
   }
 
@@ -78,13 +78,13 @@ class PostController {
       return res.status(401).send({error: "Vous n'avez pas les droits pour faire ceci!"})
       // on verifie si le poste est dans le Post
       const postToModify = req.body;
+      if(req.file){
+        postToModify.media = `${req.protocol}://${req.get("host")}/public/images/${req.file.filename}`
+      }
       post.update(postToModify);
       res.status(200).send(post.get());
-      if(req.file){
-        post.media = `${req.protocol}://${req.get("host")}/public/images/${req.file.filename}`
-      }
     } catch (error) {
-      res.status(500).send({ error: "Internal server error" });
+      res.status(500).send({ error: "Internal server error" + error});
     }
   }
   async deletePost(req, res) {

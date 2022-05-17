@@ -7,9 +7,6 @@ Comment.init({
   content: {
     type: DataTypes.STRING
   },
-  title: {
-    type: DataTypes.STRING 
-  }
 }, {
   sequelize,
   createdAt: true,

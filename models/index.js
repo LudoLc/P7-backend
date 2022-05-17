@@ -2,6 +2,7 @@ const Comment = require("./Comment");
 const Post = require("./Post");
 const Role = require("./Role");
 const User = require("./User");
+const Reaction = require("./Reaction")
 const sequelize = require("../src/db");
 
 /* Déclaration des relations entre les modèles */
@@ -18,9 +19,15 @@ Comment.belongsTo(User);
 Post.hasMany(Comment);
 Comment.belongsTo(Post);
 
+User.hasMany(Reaction);
+Reaction.belongsTo(User);
+
+Post.hasMany(Reaction);
+Reaction.belongsTo(Post);
+
 sequelize
   .sync()
   .then(() => console.log("syncrhonisation effectuée"));
 //.catch(()=> console.error("Une erreur est survenue lors de la synchronisation"))
 
-module.exports = { Comment, Post, Role, User };
+module.exports = { Comment, Post, Role, User, Reaction };

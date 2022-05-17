@@ -1,4 +1,4 @@
-const { User, Role } = require("../models");
+const { User, Role, Post, Reaction, Comment } = require("../models");
 const { ValidationError } = require("yup");
 const { yupErrorToJson } = require("../src/helpers");
 const { signupSchema } = require("../schemas/auth");
@@ -16,12 +16,12 @@ class UserController {
   }
 
   getUserID(id = null) {
-    if (id === null) return User.findAll({ include: Role });
+    if (id === null) return User.findAll({ include: [Role, Post, Reaction, Comment] });
     return User.findOne({
       where: {
         id: id,
       },
-      include: Role,
+      include: [Role,Post,Reaction,Comment]
     });
   }
 
