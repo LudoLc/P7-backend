@@ -1,7 +1,7 @@
 const { User, Post } = require("../models");
 const Reaction = require("../models/Reaction");
 const { ValidationError } = require("yup");
-const { yupErrorToJson } = require("yup");
+const { yupErrorToJson } = require("../src/helpers");
 const { reactionSchema } = require("../schemas/reaction");
 
 class ReactionsController {
@@ -26,7 +26,7 @@ class ReactionsController {
   async getAllReactions(req, res) {
     try {
       const reactions = await this.getReactionId();
-      res.status(200).send(JSON.stringify(reactions));
+        res.status(200).send(JSON.stringify(reactions));
     } catch (error) {
       res.status(401).send(error);
     }
@@ -36,14 +36,70 @@ class ReactionsController {
     try {
       await reactionSchema.validate(req.body, {
         abortEarly: false,
-        strict: true,
+        strict: false,
       });
+
+      const oldReaction = await Reaction.findOne({
+        where: {
+          PostId: req.body.PostId,
+          UserId: req.state.get("TOKEN").id 
+        }
+      });
+
+      /**
+       * Types 
+       * 1: like
+       * 0: dislike
+       */
+
+      // const oldReactionType = oldReaction.type;
+
+      const likeTypes = {
+        LIKE: 1,
+        DISLIKE: 0,
+      }
+
+      const newType = req.body.type;
+
+      let shouldCreateReaction  = true;
+
+      let customMessage = null;
+      let isWarning = false;
+
+
+      if (oldReaction){ // si déjà liké ou disliké
+        const oldType = oldReaction.type;
+        oldReaction.destroy();
+        shouldCreateReaction = false;
+
+        if(oldType == likeTypes.DISLIKE && newType == likeTypes.DISLIKE){
+          customMessage = 'vous avez déjà disliké ce post';
+          isWarning = true
+        }
+
+        if(oldType == likeTypes.LIKE && newType == likeTypes.LIKE){
+          customMessage = 'vous avez déjà liké ce post';
+          isWarning = true
+        }       
+
+
+      }
+
+      // if 0-0
+      if (!shouldCreateReaction){
+        return res.status(200).send({
+          message: customMessage || "Réaction crée!",
+          isWarning,
+        });
+      }
 
       const reaction = await Reaction.create(
         Object.assign(req.body, { UserId: req.state.get("TOKEN").id })
       );
+
       res.status(200).send({
-        message: "Reaction créer!",
+        message: customMessage || "Reaction créer!",
+        isWarning,
         ...reaction.get(),
       });
     } catch (error) {
@@ -95,7 +151,7 @@ class ReactionsController {
     try {
       const reaction = await this.getReactionId(req.params.ReactionId);
       if (reaction === undefined)
-        return res.status(404).send({ error: "Commentaire introuvable!" });
+        return res.status(404).send({ error: "Like introuvable!" });
       if (
         reaction.UserId !== req.state.get("TOKEN").id &&
         !req.state.get("TOKEN").Role.admin

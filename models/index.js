@@ -19,15 +19,25 @@ Comment.belongsTo(User);
 Post.hasMany(Comment);
 Comment.belongsTo(Post);
 
-User.hasMany(Reaction);
+User.hasMany(Reaction,);
 Reaction.belongsTo(User);
 
 Post.hasMany(Reaction);
 Reaction.belongsTo(Post);
 
 sequelize
-  .sync()
+  .sync() 
   .then(() => console.log("syncrhonisation effectuée"));
-//.catch(()=> console.error("Une erreur est survenue lors de la synchronisation"))
+  //.catch(()=> console.error("Une erreur est survenue lors de la synchronisation"))
+// Role.create({
+//   id: 1,
+//   name:"Membre",
+//   admin: false
+// })
+// Role.create({
+//   id: 2,
+//   name:"Admin",
+//   admin: true
+// })
 
 module.exports = { Comment, Post, Role, User, Reaction };

@@ -37,7 +37,7 @@ class CommentsController {
     try {
       await commentSchema.validate(req.body, {
         abortEarly: false,
-        strict: true,
+        strict: false,
       });
 
       const comment = await Comment.create(

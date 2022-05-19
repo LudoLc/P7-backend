@@ -19,7 +19,6 @@ User.init(
     },
     username: {
       type: DataTypes.STRING,
-      unique: "username",
     },
     firstname: {
       type: DataTypes.STRING,

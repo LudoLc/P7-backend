@@ -21,6 +21,9 @@ class UserController {
       where: {
         id: id,
       },
+      attributes: {
+        exclude: ["password"]
+      },
       include: [Role,Post,Reaction,Comment]
     });
   }
@@ -39,7 +42,7 @@ class UserController {
       // on apelle le schema pour les users
       await signupSchema.validate(req.body, {
         abortEarly: false,
-        strict: true,
+        strict: false,
       }); // on fait le validate et on req le body
 
       // Object.assign on deplace la requete dans le roleId (si = 1 = admin sinon  = non admin)
@@ -80,6 +83,9 @@ class UserController {
       if(req.file){
         userToModify.avatar = `${req.protocol}://${req.get("host")}/public/images/${req.file.filename}`
       }
+      if('password' in userToModify)
+      userToModify.password = bcrypt.hashSync(userToModify.password, 10)
+      console.log(userToModify.password);
       user.update(userToModify);
       res.status(200).send(user.get());
       // on verifie si le user est dans le User

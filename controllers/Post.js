@@ -41,7 +41,7 @@ class PostController {
     try {
       const decodedToken = req.state.get("TOKEN");
       // on apelle le schema pour les posts
-      await postSchema.validate(req.body, { abortEarly: false, strict: true }); // on fait le validate et on req le body
+      await postSchema.validate(req.body, { abortEarly: false, strict: false }); // on fait le validate et on req le body
       const post = Object.assign(req.body, { UserId: decodedToken.id }) 
       if(req.file){
         post.media = `${req.protocol}://${req.get("host")}/public/images/${req.file.filename}`
