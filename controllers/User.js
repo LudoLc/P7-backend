@@ -76,6 +76,7 @@ class UserController {
     }
   }
   async updateUser(req, res) {
+    
     try {
       const user = await this.getUserID(req.params.id);
       if (!user) return res.status(404).send({ error: "Not found" });
@@ -85,7 +86,6 @@ class UserController {
       }
       if('password' in userToModify)
       userToModify.password = bcrypt.hashSync(userToModify.password, 10)
-      console.log(userToModify.password);
       user.update(userToModify);
       res.status(200).send(user.get());
       // on verifie si le user est dans le User
@@ -94,13 +94,18 @@ class UserController {
   async updateAvatar(req, res) {
     try {
       const user = await this.getUserID(req.params.id);
-      if (!user) return res.status(404).send({ error: "Not found" });
-      await user.update({
-        avatar: req.file.filename
-      })
-      res.status(200).send()
+      // if (post === null) return res.status(404).send({ error: "Not found" });
+      // if(post.UserId !== req.state.get("TOKEN").id && !req.state.get("TOKEN").Role.admin)
+      // return res.status(401).send({error: "Vous n'avez pas les droits pour faire ceci!"})
+      // on verifie si le poste est dans le Post
+      const userToModify = req.body;
+      if(req.file){
+        userToModify.avatar = `${req.protocol}://${req.get("host")}/public/images/${req.file.filename}`
+      }
+      user.update(userToModify);
+      res.status(200).send({message: "Avatar modifié!", user: user.get()});
     } catch (error) {
-      res.status(500).json({ error });
+      res.status(500).send({ error: "Internal server error" + error});
     }
   }
   async deleteUser(req, res) {
