@@ -103,7 +103,6 @@ class ReactionsController {
         ...reaction.get(),
       });
     } catch (error) {
-      console.log(error);
       if (error instanceof ValidationError)
         return res.status(400).send({
           errors: yupErrorToJson(error),
@@ -142,7 +141,6 @@ class ReactionsController {
       reaction.update(req.body);
       res.status(200).send(reaction.get());
     } catch (error) {
-      console.log(error);
       res.status(500).send({ error: "Internal server error" });
     }
   }
