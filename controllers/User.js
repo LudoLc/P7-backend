@@ -2,7 +2,7 @@ const { User, Role, Post, Reaction, Comment } = require("../models");
 const { ValidationError } = require("yup");
 const { yupErrorToJson } = require("../src/helpers");
 const { signupSchema } = require("../schemas/auth");
-const { fstat } = require("fs");
+const fs = require("fs");
 
 class UserController {
   constructor() {
@@ -93,16 +93,17 @@ class UserController {
   }
   async updateAvatar(req, res) {
     try {
-      const user = await this.getUserID(req.params.id);
-      // if (post === null) return res.status(404).send({ error: "Not found" });
-      // if(post.UserId !== req.state.get("TOKEN").id && !req.state.get("TOKEN").Role.admin)
-      // return res.status(401).send({error: "Vous n'avez pas les droits pour faire ceci!"})
-      // on verifie si le poste est dans le Post
-      const userToModify = req.body;
-      if(req.file){
-        userToModify.avatar = `${req.protocol}://${req.get("host")}/public/images/${req.file.filename}`
+      if(!req.file){
+        return res.status(400).send({message: "Veuillez choisir une image! "})
       }
-      user.update(userToModify);
+      const user = await this.getUserID(req.params.id);
+      if(user.avatar !== "http://localhost:3000/public/images/profile_white.png"){
+        const filename = user.avatar.split("/images/")[1];
+        fs.unlink(`public/images/${filename}`, () => {})
+      }
+      await user.update({
+        avatar: `${req.protocol}://${req.get("host")}/public/images/${req.file.filename}`
+      });
       res.status(200).send({message: "Avatar modifié!", user: user.get()});
     } catch (error) {
       res.status(500).send({ error: "Internal server error" + error});
