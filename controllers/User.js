@@ -3,6 +3,7 @@ const { ValidationError } = require("yup");
 const { yupErrorToJson } = require("../src/helpers");
 const { signupSchema } = require("../schemas/auth");
 const fs = require("fs");
+const bcrypt = require("bcrypt");
 
 class UserController {
   constructor() {
@@ -84,8 +85,9 @@ class UserController {
       if(req.file){
         userToModify.avatar = `${req.protocol}://${req.get("host")}/public/images/${req.file.filename}`
       }
-      if('password' in userToModify)
-      userToModify.password = bcrypt.hashSync(userToModify.password, 10)
+      if(req.body.password){
+        userToModify.password = bcrypt.hashSync(userToModify.password, 10)
+      }
       user.update(userToModify);
       res.status(200).send(user.get());
       // on verifie si le user est dans le User

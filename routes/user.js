@@ -10,7 +10,7 @@ const multerAvatar = require("../middlewares/multerAvatar");
 router.get("/", auth, userController.getAllUsers);
 router.post("/", auth, connectionGuard, userController.createUser);
 router.get("/:id", auth, userController.getUser);
-router.put("/:id",auth, multerAvatar,connectionGuard,userController.updateUser);
+router.put("/:id",auth, multerAvatar ,connectionGuard,userController.updateUser);
 router.put("/avatar/:id",auth, multerAvatar, connectionGuard,userController.updateAvatar);
 router.delete("/:id",auth, connectionGuard,userController.deleteUser);
 

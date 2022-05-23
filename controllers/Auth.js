@@ -70,7 +70,7 @@ class AuthController {
         })
       ); // fonction pour créer l'utilisateur si les données remplies avant sont bonnes
     } catch (error) {
-
+      console.log(error);
       return res.status(409).send({
         error: "Erreur lors de la création de l'utilisateur",
       });
