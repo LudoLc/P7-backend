@@ -94,7 +94,7 @@ class PostController {
         return res.status(404).send({ error: "Post introuvable!" });
         if(post.UserId !== req.state.get("TOKEN").id && !req.state.get("TOKEN").Role.admin)
         return res.status(401).send({error: "Vous n'avez pas les droits pour faire ceci!"})
-      // grace a multer on va supprimer l'image source dans le images/filename
+      // grace a multerPost on va supprimer l'image source dans le images/filename
       if(post.media){
         const filename = post.media.split("/images/")[1];
         await fs.unlink(`public/images/${filename}`);
