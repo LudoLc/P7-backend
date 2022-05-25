@@ -115,9 +115,6 @@ class UserController {
     try {
       const user = await this.getUserID(req.params.id);
       if (user === null) return res.status(401).json({ error });
-      // grace a multerPost on va supprimer l'image source dans le images/filename
-      //const filename = user.media.split("/images/")[1];
-      //return fs.unlink(`images/${filename}`, () => {
       await user.destroy();
       res.status(200).json({ message: "user supprimé!" });
     } catch (error) {
