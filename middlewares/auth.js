@@ -15,6 +15,6 @@ module.exports = (req, res, next) => {
     req.state.set("TOKEN", null);
     req.state.set("Connected", false); // non connecté
     req.state.set("isAdmin", false);
-    return res.status(401).json({message:"Non connecté"})
+    return res.status(401).json({ message: "Non connecté" });
   }
 };

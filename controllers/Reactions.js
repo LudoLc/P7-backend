@@ -12,7 +12,8 @@ class ReactionsController {
     this.updateReaction = this.updateReaction.bind(this);
     this.deleteReaction = this.deleteReaction.bind(this);
   }
-
+  // on souhaite recueprer l'ID d'une reaction, pour cela , si l'id vaut undifinied = qui n'existe pas
+  // alors on execute un findAll qui nous retourne les valeurs de l'Id pour un User et pour un Post
   getReactionId(id) {
     if (id === undefined) return Reaction.findAll({ include: [User, Post] });
     return Reaction.findOne({
@@ -22,18 +23,21 @@ class ReactionsController {
       include: [User, Post],
     });
   }
-
+  // utilisation d'une methode async await, permettant de recuperer toutes les reactions .
   async getAllReactions(req, res) {
     try {
       const reactions = await this.getReactionId();
-        res.status(200).send(JSON.stringify(reactions));
+      res.status(200).send(JSON.stringify(reactions));
+      // si on a bien recuperé toutes les reactions alors on envoie une 200 = ok
     } catch (error) {
       res.status(401).send(error);
+      // sinon si on ne recupere pas les reactions alors on envoie une 401
     }
   }
 
   async createReaction(req, res) {
     try {
+      // on valide les conditons du schemas qu'on lui à défini
       await reactionSchema.validate(req.body, {
         abortEarly: false,
         strict: false,
@@ -42,51 +46,37 @@ class ReactionsController {
       const oldReaction = await Reaction.findOne({
         where: {
           PostId: req.body.PostId,
-          UserId: req.state.get("TOKEN").id 
-        }
+          UserId: req.state.get("TOKEN").id,
+        },
       });
-
-      /**
-       * Types 
-       * 1: like
-       * 0: dislike
-       */
-
-      // const oldReactionType = oldReaction.type;
 
       const likeTypes = {
         LIKE: 1,
         DISLIKE: 0,
-      }
-
+      };
       const newType = req.body.type;
-
-      let shouldCreateReaction  = true;
-
+      let shouldCreateReaction = true;
       let customMessage = null;
       let isWarning = false;
 
-
-      if (oldReaction){ // si déjà liké ou disliké
+      if (oldReaction) {
+        // si déjà liké ou disliké
         const oldType = oldReaction.type;
         oldReaction.destroy();
         shouldCreateReaction = false;
 
-        if(oldType == likeTypes.DISLIKE && newType == likeTypes.DISLIKE){
-          customMessage = 'vous avez déjà disliké ce post';
-          isWarning = true
+        if (oldType == likeTypes.DISLIKE && newType == likeTypes.DISLIKE) {
+          customMessage = "vous avez déjà disliké ce post";
+          isWarning = true;
         }
 
-        if(oldType == likeTypes.LIKE && newType == likeTypes.LIKE){
-          customMessage = 'vous avez déjà liké ce post';
-          isWarning = true
-        }       
-
-
+        if (oldType == likeTypes.LIKE && newType == likeTypes.LIKE) {
+          customMessage = "vous avez déjà liké ce post";
+          isWarning = true;
+        }
       }
 
-      // if 0-0
-      if (!shouldCreateReaction){
+      if (!shouldCreateReaction) {
         return res.status(200).send({
           message: customMessage || "Réaction crée!",
           isWarning,
@@ -115,8 +105,7 @@ class ReactionsController {
   async getReaction(req, res) {
     try {
       const reaction = await this.getReactionId(req.params.ReactionId);
-      if (reaction)
-        return res.status(200).send({ reaction });
+      if (reaction) return res.status(200).send({ reaction });
       return res.status(404).send({ error: "Unauthorized" });
     } catch (error) {
       if (error instanceof ValidationError)
@@ -154,11 +143,9 @@ class ReactionsController {
         reaction.UserId !== req.state.get("TOKEN").id &&
         !req.state.get("TOKEN").Role.admin
       )
-        return res
-          .status(401)
-          .send({
-            error: "Vous n'avez pas les droits suffisants pour faire ceci!",
-          });
+        return res.status(401).send({
+          error: "Vous n'avez pas les droits suffisants pour faire ceci!",
+        });
       await reaction.destroy();
       res.status(200).json({ message: "Reaction supprimé!" });
     } catch (error) {

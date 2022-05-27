@@ -9,7 +9,10 @@ class AuthController {
   // classe qui contient les données du login et signup afin de les réutiliser
   async login(req, res) {
     try {
-      await loginSchema.validate(req.body, { abortEarly: false, strict: false });
+      await loginSchema.validate(req.body, {
+        abortEarly: false,
+        strict: false,
+      });
       const user = await User.findOne({
         where: {
           email: req.body.email,
@@ -35,7 +38,7 @@ class AuthController {
         // renvoie une 201 et genère un token
         user,
         token: jwt.sign(user.get(), process.env.SECRET_JWT_KEY, {
-          expiresIn: 60 * 60 * 24 * 45,
+          expiresIn: 7200,
         }),
       });
     } catch (error) {
@@ -61,7 +64,7 @@ class AuthController {
       });
     }
     let userCreated;
-    try{
+    try {
       userCreated = await User.create(
         Object.assign(req.body, {
           RoleId: 1,
@@ -81,12 +84,11 @@ class AuthController {
           email: userCreated.email,
         },
         attributes: {
-          exclude: ["password"]
+          exclude: ["password"],
         },
         include: Role,
       });
     } catch (error) {
-
       return res.status(409).send({
         error: "Erreur lors de la récupération de l'utilisateur",
       });
@@ -100,6 +102,6 @@ class AuthController {
         expiresIn: 60 * 60 * 24 * 45,
       }),
     });
-  } 
+  }
 }
 module.exports = new AuthController();

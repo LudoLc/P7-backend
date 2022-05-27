@@ -3,14 +3,14 @@ const multer = require("multer");
 
 const MIME_TYPES = {
   //mimetype: 'image/png',
-  'image/jpg': 'jpg',
-  'image/jpeg': 'jpeg',
-  'image/png': 'png',
-  'image/bmp': 'bmp',
-  'image/svg': 'svg',
-  'video/mp4': 'mp4',
-  'video/avi': 'avi',
-  'image/gif': 'gif',
+  "image/jpg": "jpg",
+  "image/jpeg": "jpeg",
+  "image/png": "png",
+  "image/bmp": "bmp",
+  "image/svg": "svg",
+  "video/mp4": "mp4",
+  "video/avi": "avi",
+  "image/gif": "gif",
 };
 
 const storage = multer.diskStorage({

@@ -6,7 +6,7 @@ Reaction.init(
   {
     type: {
       type: DataTypes.INTEGER,
-    }
+    },
   },
   {
     sequelize,

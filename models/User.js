@@ -27,8 +27,8 @@ User.init(
       type: DataTypes.STRING,
     },
     description: {
-      type: DataTypes.STRING
-    }
+      type: DataTypes.STRING,
+    },
   },
   {
     sequelize,

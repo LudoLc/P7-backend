@@ -4,7 +4,6 @@ const { postSchema } = require("../schemas/post");
 const { yupErrorToJson } = require("../src/helpers");
 const fs = require("fs/promises");
 
-
 class PostController {
   constructor() {
     // on force le this a avoir la valeur du post controller .
@@ -13,18 +12,21 @@ class PostController {
     this.getPost = this.getPost.bind(this);
     this.updatePost = this.updatePost.bind(this);
     this.deletePost = this.deletePost.bind(this);
+    // le .bind permet d'associer le bon .this a l'element que l'on souhaite qui sera apres appelé dans la fonction.
   }
 
   getPostID(id = null) {
-    if (id === null) return Post.findAll({ include: [User, {model: Comment, include:[User]}, Reaction], order:[['id', 'DESC']] });
+    if (id === null)
+      return Post.findAll({
+        include: [User, { model: Comment, include: [User] }, Reaction],
+        order: [["id", "DESC"]],
+      });
     return Post.findOne({
       where: {
         id: id,
       },
-      order: [
-        ['id', 'DESC']
-      ],
-      include: [User,Comment, Reaction],
+      order: [["id", "DESC"]],
+      include: [User, Comment, Reaction],
     });
   }
 
@@ -42,9 +44,11 @@ class PostController {
       const decodedToken = req.state.get("TOKEN");
       // on apelle le schema pour les posts
       await postSchema.validate(req.body, { abortEarly: false, strict: false }); // on fait le validate et on req le body
-      const post = Object.assign(req.body, { UserId: decodedToken.id }) 
-      if(req.file){
-        post.media = `${req.protocol}://${req.get("host")}/public/images/${req.file.filename}`
+      const post = Object.assign(req.body, { UserId: decodedToken.id });
+      if (req.file) {
+        post.media = `${req.protocol}://${req.get("host")}/public/images/${
+          req.file.filename
+        }`;
       }
       await Post.create(post); // a partir du Post , si les infos sont bonnes alors on retourne une 200 : post crée
       res.status(200).send({
@@ -74,17 +78,24 @@ class PostController {
     try {
       const post = await this.getPostID(req.params.id);
       if (post === null) return res.status(404).send({ error: "Not found" });
-      if(post.UserId !== req.state.get("TOKEN").id && !req.state.get("TOKEN").Role.admin)
-      return res.status(401).send({error: "Vous n'avez pas les droits pour faire ceci!"})
+      if (
+        post.UserId !== req.state.get("TOKEN").id &&
+        !req.state.get("TOKEN").Role.admin
+      )
+        return res
+          .status(401)
+          .send({ error: "Vous n'avez pas les droits pour faire ceci!" });
       // on verifie si le poste est dans le Post
       const postToModify = req.body;
-      if(req.file){
-        postToModify.media = `${req.protocol}://${req.get("host")}/public/images/${req.file.filename}`
+      if (req.file) {
+        postToModify.media = `${req.protocol}://${req.get(
+          "host"
+        )}/public/images/${req.file.filename}`;
       }
       post.update(postToModify);
       res.status(200).send(post.get());
     } catch (error) {
-      res.status(500).send({ error: "Internal server error" + error});
+      res.status(500).send({ error: "Internal server error" + error });
     }
   }
   async deletePost(req, res) {
@@ -92,10 +103,15 @@ class PostController {
       const post = await this.getPostID(req.params.id);
       if (post === null)
         return res.status(404).send({ error: "Post introuvable!" });
-        if(post.UserId !== req.state.get("TOKEN").id && !req.state.get("TOKEN").Role.admin)
-        return res.status(401).send({error: "Vous n'avez pas les droits pour faire ceci!"})
+      if (
+        post.UserId !== req.state.get("TOKEN").id &&
+        !req.state.get("TOKEN").Role.admin
+      )
+        return res
+          .status(401)
+          .send({ error: "Vous n'avez pas les droits pour faire ceci!" });
       // grace a multerPost on va supprimer l'image source dans le images/filename
-      if(post.media){
+      if (post.media) {
         const filename = post.media.split("/images/")[1];
         await fs.unlink(`public/images/${filename}`);
       }

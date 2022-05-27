@@ -73,8 +73,13 @@ class CommentsController {
     try {
       const comment = await this.getCommentID(req.params.id);
       if (comment === null) return res.status(404).send({ error: "Not found" });
-      if(comment.UserId !== req.state.get("TOKEN").id && !req.state.get("TOKEN").Role.admin)
-        return res.status(401).send({error: "Vous n'avez pas les droits pour faire ceci!"})
+      if (
+        comment.UserId !== req.state.get("TOKEN").id &&
+        !req.state.get("TOKEN").Role.admin
+      )
+        return res
+          .status(401)
+          .send({ error: "Vous n'avez pas les droits pour faire ceci!" });
       // on verifie si le poste est dans le PostModel
       comment.update(req.body);
       res.status(200).send(comment.get());
@@ -87,17 +92,20 @@ class CommentsController {
       const comment = await this.getCommentID(req.params.id);
       if (comment === null)
         return res.status(404).send({ error: "Commentaire introuvable!" });
-        if(comment.UserId !== req.state.get("TOKEN").id && !req.state.get("TOKEN").Role.admin)
-        return res.status(401).send({error: "Vous n'avez pas les droits pour faire ceci!"})
+      if (
+        comment.UserId !== req.state.get("TOKEN").id &&
+        !req.state.get("TOKEN").Role.admin
+      )
+        return res
+          .status(401)
+          .send({ error: "Vous n'avez pas les droits pour faire ceci!" });
       // grace a multerPost on va supprimer l'image source dans le images/filename
       // if(post.media){
       //   const filename = post.media.split("/images/")[1];
       //   await fs.unlink(`images/${filename}`);
       // }
       await comment.destroy();
-      res
-        .status(200)
-        .json({ message: "Commentaire supprimé!" })
+      res.status(200).json({ message: "Commentaire supprimé!" });
     } catch (error) {
       res.status(500).json({ error });
     }

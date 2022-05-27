@@ -1,17 +1,18 @@
-const { Model, DataTypes } = require('@sequelize/core');
-const sequelize = require('../src/db');
+const { Model, DataTypes } = require("@sequelize/core");
+const sequelize = require("../src/db");
 
-class Comment extends Model {
-}
-Comment.init({
-  content: {
-    type: DataTypes.STRING
+class Comment extends Model {}
+Comment.init(
+  {
+    content: {
+      type: DataTypes.STRING,
+    },
   },
-}, {
-  sequelize,
-  createdAt: true,
-  updatedAt: true,
-})
+  {
+    sequelize,
+    createdAt: true,
+    updatedAt: true,
+  }
+);
 
 module.exports = Comment; // appel du module .
-

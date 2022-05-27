@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const postController = require("../controllers/Post");
 const connectionGuard = require("../middlewares/guards/connectionGuard");
-//const authorisationGuard = require("../middlewares/guards/authorisationGuard");
 const auth = require('../middlewares/auth')
 const multerPost = require('../middlewares/multerPost')
 

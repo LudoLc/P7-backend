@@ -17,15 +17,16 @@ class UserController {
   }
 
   getUserID(id = null) {
-    if (id === null) return User.findAll({ include: [Role, Post, Reaction, Comment] });
+    if (id === null)
+      return User.findAll({ include: [Role, Post, Reaction, Comment] });
     return User.findOne({
       where: {
         id: id,
       },
       attributes: {
-        exclude: ["password"]
+        exclude: ["password"],
       },
-      include: [Role,Post,Reaction,Comment]
+      include: [Role, Post, Reaction, Comment],
     });
   }
 
@@ -77,38 +78,47 @@ class UserController {
     }
   }
   async updateUser(req, res) {
-    
     try {
       const user = await this.getUserID(req.params.id);
       if (!user) return res.status(404).send({ error: "Not found" });
       const userToModify = req.body;
-      if(req.file){
-        userToModify.avatar = `${req.protocol}://${req.get("host")}/public/images/${req.file.filename}`
+      if (req.file) {
+        userToModify.avatar = `${req.protocol}://${req.get(
+          "host"
+        )}/public/images/${req.file.filename}`;
       }
-      if(req.body.password){
-        userToModify.password = bcrypt.hashSync(userToModify.password, 10)
+      if (req.body.password) {
+        userToModify.password = bcrypt.hashSync(userToModify.password, 10);
       }
       user.update(userToModify);
       res.status(200).send(user.get());
       // on verifie si le user est dans le User
-    } catch (error) {}
+    } catch (error) {
+      res.status(500).send({ error: "Internal server error" });
+    }
   }
   async updateAvatar(req, res) {
     try {
-      if(!req.file){
-        return res.status(400).send({message: "Veuillez choisir une image! "})
+      if (!req.file) {
+        return res
+          .status(400)
+          .send({ message: "Veuillez choisir une image! " });
       }
       const user = await this.getUserID(req.params.id);
-      if(user.avatar !== "http://localhost:3000/public/images/profile_white.png"){
+      if (
+        user.avatar !== "http://localhost:3000/public/images/profile_white.png"
+      ) {
         const filename = user.avatar.split("/images/")[1];
-        fs.unlink(`public/images/${filename}`, () => {})
+        fs.unlink(`public/images/${filename}`, () => {});
       }
       await user.update({
-        avatar: `${req.protocol}://${req.get("host")}/public/images/${req.file.filename}`
+        avatar: `${req.protocol}://${req.get("host")}/public/images/${
+          req.file.filename
+        }`,
       });
-      res.status(200).send({message: "Avatar modifié!", user: user.get()});
+      res.status(200).send({ message: "Avatar modifié!", user: user.get() });
     } catch (error) {
-      res.status(500).send({ error: "Internal server error" + error});
+      res.status(500).send({ error: "Internal server error" + error });
     }
   }
   async deleteUser(req, res) {
