@@ -70,7 +70,7 @@ class UserController {
   async getUser(req, res) {
     try {
       const user = await this.getUserID(req.params.id);
-      // let .get() va permettre de récuperer le contenu du usere (qui se trouve dans la BDD)
+      // le .get() va permettre de récuperer le contenu du user (qui se trouve dans la BDD)
       if (user === null) return res.status(404).send({ error: "Unauthorized" });
       res.status(200).send(user.get());
     } catch (error) {
