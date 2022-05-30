@@ -1,6 +1,7 @@
 # P7-backend
 
 This is the README for the final project number 7 from the formation OpenClassRooms : Groupomania
+<img src="https://projet-7.dev-web.fr/assets/logo/logo.png">
 
 # Installation :
 
