@@ -12,6 +12,7 @@ For following commands, you can replace npm depending your preferences Install t
 npm install And run this command for having the dependencies update list :
 
 npm i -g npm-check-updates
+npm i mysql2 
 
 # Configuration : 
 Once the project is initialized, you may rename .env.example file to .env, and set your settings.
